@@ -1,28 +1,7 @@
 from crewai import Agent
-
-# from core.llm_manager import llm
 from core.llm_manager import llm_manager
 llm = llm_manager.get_llm()
 
-# extractor_agent = Agent(
-#     role="Information Extractor",
-#     goal="""
-#     Extract key insights, entities, metrics,
-#     and factual information from collected data.
-#     """,
-#     backstory="""
-#     NLP specialist focused on extracting relevant,
-#     high-quality structured information.
-#     """,
-#     llm=llm,
-#     verbose=True,
-# )
-
-
-
-# =====================================================
-# Information Extractor Agent
-# =====================================================
 extractor_agent = Agent(
     role="Information Extractor",
     goal="""

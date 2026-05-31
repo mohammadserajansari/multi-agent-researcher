@@ -1,27 +1,7 @@
 from crewai import Agent
-# from core.llm_manager import llm
 from core.llm_manager import llm_manager
 llm = llm_manager.get_llm()
 
-# confidence_agent = Agent(
-#     role="Confidence Evaluator",
-#     goal="""
-#     Evaluate confidence score based on source quality,
-#     consistency, completeness, and evidence strength.
-#     """,
-#     backstory="""
-#     AI evaluator specialized in factual consistency
-#     and reliability assessment.
-#     """,
-#     llm=llm,
-#     verbose=True,
-# )
-
-
-
-# =====================================================
-# Confidence Evaluator Agent
-# =====================================================
 confidence_agent = Agent(
     role="Confidence Evaluator",
     goal="""

@@ -2,29 +2,6 @@ from crewai import Agent
 
 from core.llm_manager import llm_manager
 llm = llm_manager.get_llm()
-
-# writer_agent = Agent(
-#     role="Research Report Writer",
-#     goal="""
-#     Create professional research reports with
-#     summaries, findings, tables, and conclusions.
-#     """,
-#     backstory="""
-#     Technical writer experienced in AI-generated
-#     reporting and structured documentation.
-#     """,
-#     llm=llm,
-#     verbose=True,
-# )
-
-
-
-
-
-
-# =====================================================
-# Research Report Writer Agent
-# =====================================================
 writer_agent = Agent(
     role="Research Report Writer",
     goal="""

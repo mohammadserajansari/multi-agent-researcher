@@ -8,10 +8,6 @@ from agents.comparator_agent import comparator_agent
 from agents.writer_agent import writer_agent
 from agents.confidence_scoring_agent import confidence_agent
 
-
-# =====================================================
-# Planner Task
-# =====================================================
 planning_task = Task(
     description="""
     Analyze the user query: "{query}" 
@@ -35,9 +31,6 @@ planning_task = Task(
 )
 
 
-# =====================================================
-# Source Gathering Task
-# =====================================================
 source_task = Task(
     description="""
     Your objective is to assemble all raw data required for the user's request: "{query}".
@@ -53,13 +46,9 @@ source_task = Task(
     Combined raw research data prioritizing the uploaded local documents, supplemented by web search results.
     """,
     agent=source_gatherer_agent,
-    context=[planning_task]  # Feeds the research plan context into this task
+    context=[planning_task]  
 )
 
-
-# =====================================================
-# Extraction Task
-# =====================================================
 extraction_task = Task(
     description="""
     Review the combined raw research data gathered in the previous step. 
@@ -70,13 +59,8 @@ extraction_task = Task(
     Structured extracted insights.
     """,
     agent=extractor_agent,
-    context=[source_task]  # Ensures the gathered raw file/web data is handed directly to the extractor
-)
+    context=[source_task])
 
-
-# =====================================================
-# Comparison Task
-# =====================================================
 comparison_task = Task(
     description="""
     Compare all extracted data from the documents and web resources.
@@ -92,13 +76,10 @@ comparison_task = Task(
     Detailed comparative analysis.
     """,
     agent=comparator_agent,
-    context=[extraction_task]  # Hands extracted insights directly to the comparator
+    context=[extraction_task]  
 )
 
 
-# =====================================================
-# Report Writing Task
-# =====================================================
 writing_task = Task(
     description="""
     Generate a final professional research report based on the comparative analysis. 
@@ -117,13 +98,10 @@ writing_task = Task(
     Final detailed research report.
     """,
     agent=writer_agent,
-    context=[comparison_task]  # Hands the final comparison structure directly to the writer
+    context=[comparison_task] 
 )
 
 
-# =====================================================
-# Confidence Scoring Task
-# =====================================================
 confidence_task = Task(
     description="""
     Evaluate overall confidence and reliability of the generated report.
@@ -139,5 +117,5 @@ confidence_task = Task(
     Confidence score with justification.
     """,
     agent=confidence_agent,
-    context=[writing_task]  # Hands the drafted report to the grader for validation
+    context=[writing_task]  
 )

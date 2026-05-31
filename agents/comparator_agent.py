@@ -3,24 +3,6 @@ from crewai import Agent
 from core.llm_manager import llm_manager
 llm = llm_manager.get_llm()
 
-# comparator_agent = Agent(
-#     role="Comparator Analyst",
-#     goal="""
-#     Compare multiple datasets, identify similarities,
-#     differences, contradictions, and trends.
-#     """,
-#     backstory="""
-#     Analytical AI expert with strong comparative
-#     reasoning and synthesis capabilities.
-#     """,
-#     llm=llm,
-#     verbose=True,
-# )
-
-
-# =====================================================
-# Comparator Analyst Agent
-# =====================================================
 comparator_agent = Agent(
     role="Comparator Analyst",
     goal="""

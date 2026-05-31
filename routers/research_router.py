@@ -103,19 +103,6 @@ async def analyze_research(
                     content=str(extracted_data)
                 )
 
-        # # =================================================
-        # # Run CrewAI Pipeline
-        # # =================================================
-        # # loaded_data will pass safely as [] if no files were uploaded
-        # result = research_crew.kickoff(
-        #     inputs={
-        #         "query": query,
-        #         "loaded_data": loaded_data  
-        #     }
-        # )
-        # =================================================
-        # Run CrewAI 
-        # =================================================
         
         # DEBUG LOG: Verify what text actually got extracted
         logger.info(f"Total files successfully loaded: {len(loaded_data)}")
@@ -128,21 +115,12 @@ async def analyze_research(
                 context_string += f"\nFile Name: {doc['file_name']}\n"
                 context_string += f"Content:\n{doc['content']}\n"
         
-        # We append the document text straight to the query so the LLM is forced to look at it
         enhanced_query = f"{query}\n{context_string}"
 
-        # result = research_crew.kickoff(
-        #     inputs={
-        #         "query": enhanced_query,             # Force context into the main query
-        #         "raw_document_context": context_string # Separated variable just in case
-        #     }
-        # )
-        # =
-        # Inside your router (This is already correct in your code, keep it like this)
         result = research_crew.kickoff(
             inputs={
                 "query": query,
-                "loaded_data": str(loaded_data) # Convert to string to ensure it injects cleanly
+                "loaded_data": str(loaded_data) 
             }
         )
         # ================================================

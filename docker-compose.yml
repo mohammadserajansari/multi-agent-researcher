@@ -1,8 +1,58 @@
+# version: "3.9"
+
+# services:
+#   fastapi-app:
+#     build: .
+#     container_name: fastapi-app
+
+#     ports:
+#       - "8000:8000"
+
+#     volumes:
+#       - .:/app
+
+#     depends_on:
+#       - ollama
+
+#     environment:
+#       - OLLAMA_BASE_URL=http://ollama:11434
+
+#     restart: unless-stopped
+
+#     command: uvicorn main:app --host 0.0.0.0 --port 8000 --reload
+
+#   ollama:
+#     image: ollama/ollama:latest
+#     container_name: ollama
+
+#     ports:
+#       - "11434:11434"
+
+#     volumes:
+#       - ollama_data:/root/.ollama
+
+#     restart: unless-stopped
+
+#     entrypoint: >
+#       /bin/sh -c "
+#       ollama serve &
+#       sleep 5 &&
+#       ollama pull gemma3:1b &&
+#       wait
+#       "
+
+# volumes:
+#   ollama_data:
+
+
 version: "3.9"
 
 services:
+
   fastapi-app:
+
     build: .
+
     container_name: fastapi-app
 
     ports:
@@ -11,35 +61,13 @@ services:
     volumes:
       - .:/app
 
-    depends_on:
-      - ollama
-
     environment:
-      - OLLAMA_BASE_URL=http://ollama:11434
+      - OLLAMA_BASE_URL=http://host.docker.internal:11434
 
     restart: unless-stopped
 
-    command: uvicorn main:app --host 0.0.0.0 --port 8000 --reload
-
-  ollama:
-    image: ollama/ollama:latest
-    container_name: ollama
-
-    ports:
-      - "11434:11434"
-
-    volumes:
-      - ollama_data:/root/.ollama
-
-    restart: unless-stopped
-
-    entrypoint: >
-      /bin/sh -c "
-      ollama serve &
-      sleep 5 &&
-      ollama pull gemma3:1b &&
-      wait
-      "
-
-volumes:
-  ollama_data:
+    command: >
+      uvicorn main:app
+      --host 0.0.0.0
+      --port 8000
+      --reload

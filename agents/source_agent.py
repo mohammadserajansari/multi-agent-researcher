@@ -1,55 +1,9 @@
-# from crewai import Agent
-# from core.llm_manager import llm
-# from tools.tavily_search import tavily_search
-
-# source_gatherer_agent = Agent(
-#     role="Source Gatherer",
-#     goal="""
-#     Collect data from internet search, PDFs, HTML,
-#     TXT, CSV, and Excel files.
-#     """,
-#     backstory="""
-#     Expert data collector specialized in structured
-#     and unstructured information gathering.
-#     """,
-#     llm=llm,
-#     tools=[tavily_search],
-#     verbose=True,
-# )
-
-
 from crewai import Agent
-
-# from core.llm_manager import llm
 from core.llm_manager import llm_manager
 
 from tools.tavily_search import tavily_search
 llm = llm_manager.get_llm()
 
-
-# source_gatherer_agent = Agent(
-#     role="Source Gatherer",
-
-#     goal="""
-#     Gather information from internet and files.
-#     """,
-
-#     backstory="""
-#     Expert internet researcher and data collector.
-#     """,
-
-#     llm=llm,
-
-#     tools=[tavily_search],
-
-#     verbose=True
-# )
-
-
-
-# =====================================================
-# Source Gatherer Agent
-# =====================================================
 source_gatherer_agent = Agent(
     role="Primary Source and Document Collector",
     goal="""

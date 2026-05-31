@@ -351,20 +351,16 @@ SQLite database is used for:
 
 ---
 
-# Future Improvements
+# Conclusion 
+In this assessment, I implemented a multi-agent AI system capable of processing and analyzing multiple document formats. The project integrates Agentic AI workflows for research and reasoning, SQLite for persistent storage, Ollama for local LLM serving, and Tavily for real-time web search capabilities.
 
-- Vector Database Integration
-- RAG Pipeline
-- Semantic Search
-- Redis Queue
-- Celery Background Workers
-- Streamlit Dashboard
-- Authentication
-- Multi-user Workspace
-- Report Export (PDF/DOCX)
+The entire system was developed using zero-cost APIs and local infrastructure, making it fully reproducible and cost-efficient. By following the provided setup instructions, anyone can reproduce the same results and workflow on their own system.
+
+For local model execution and development, the project was built and tested on an Apple Silicon M1 machine.
 
 ---
 
 # Author
 
-## Mohammad Seraj
+## Mohammad Seraj  
+📧 [mail.serajansri@gmail.com](mailto:mail.serajansri@gmail.com)
