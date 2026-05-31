@@ -1,0 +1,62 @@
+# Git
+.git
+.gitignore
+
+# Python cache
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Virtual environments
+venv/
+.env/
+.venv/
+
+# IDE files
+.vscode/
+.idea/
+
+# Logs
+*.log
+
+# Environment files
+.env
+.env.*
+
+# Testing
+.pytest_cache/
+.coverage
+htmlcov/
+
+# Build artifacts
+build/
+dist/
+*.egg-info/
+
+# Local DB
+*.db
+*.sqlite3
+
+# Uploads/temp
+uploads/
+temp/
+tmp/
+
+# Node
+node_modules/
+
+# Docker
+docker-compose.override.yml
+
+# macOS
+.DS_Store
+
+
+# pycached
+
+__pycache__
+*/__pycache__
+
+
+./logs

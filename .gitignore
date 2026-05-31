@@ -1,0 +1,75 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Virtual Environment
+venv/
+.env/
+.venv/
+
+# Environment Variables
+.env
+
+
+# Logs
+*.log
+
+# IDEs
+.vscode/
+.idea/
+
+# macOS
+.DS_Store
+
+# Jupyter
+.ipynb_checkpoints/
+
+# Pytest
+.pytest_cache/
+
+# Coverage
+.coverage
+htmlcov/
+
+# Build files
+build/
+dist/
+*.egg-info/
+
+# SQLite
+*.db
+*.sqlite3
+
+# Docker
+docker-compose.override.yml
+
+# FastAPI uploads/temp files
+uploads/
+temp/
+tmp/
+
+# MyPy
+.mypy_cache/
+
+# Ruff
+.ruff_cache/
+
+# PyCharm
+*.iml
+
+# Secrets
+secrets/
+credentials.json
+
+# Node modules (if frontend exists)
+node_modules/
+
+
+# pycached
+
+__pycache__
+*/__pycache__
+
+
+./logs

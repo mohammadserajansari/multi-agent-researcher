@@ -1,0 +1,411 @@
+# from pathlib import Path
+# from typing import Annotated
+
+# import aiofiles
+
+# from fastapi import (
+#     APIRouter,
+#     UploadFile,
+#     File,
+#     Form,
+#     HTTPException
+# )
+
+# from agents.crew import research_crew
+# from core.database import db
+# from core.logger import logger
+# from tools.data_loader import DataLoader
+
+
+# router = APIRouter(
+#     prefix="/research",
+#     tags=["Research"]
+# )
+
+# # =========================================================
+# # Upload Directory
+# # =========================================================
+
+# UPLOAD_DIR = Path("uploads")
+
+# UPLOAD_DIR.mkdir(exist_ok=True)
+
+# # =========================================================
+# # Allowed Extensions
+# # =========================================================
+
+# ALLOWED_EXTENSIONS = {
+#     ".txt",
+#     ".pdf",
+#     ".html",
+#     ".htm",
+#     ".csv",
+#     ".xlsx",
+#     ".xls"
+# }
+
+
+# # =========================================================
+# # Research Endpoint
+# # =========================================================
+
+# @router.post("/analyze")
+# async def analyze_research(
+
+#     query: Annotated[
+#         str,
+#         Form(...)
+#     ],
+
+#     files: Annotated[
+#         list[UploadFile],
+#         File(...)
+#     ]
+
+# ):
+
+#     try:
+
+#         logger.info(
+#             "Research request started"
+#         )
+
+#         # =================================================
+#         # Create Research Session
+#         # =================================================
+
+#         session_id = (
+#             db.create_research_session(
+#                 query=query
+#             )
+#         )
+
+#         loaded_data = []
+
+#         uploaded_files = []
+
+#         # =================================================
+#         # Process Uploaded Files
+#         # =================================================
+
+#         for file in files:
+
+#             extension = Path(
+#                 file.filename
+#             ).suffix.lower()
+
+#             # =============================================
+#             # Validate Extension
+#             # =============================================
+
+#             if extension not in ALLOWED_EXTENSIONS:
+
+#                 raise HTTPException(
+#                     status_code=400,
+#                     detail=f"""
+#                     Unsupported file type:
+#                     {extension}
+#                     """
+#                 )
+
+#             # =============================================
+#             # Save Uploaded File
+#             # =============================================
+
+#             file_path = (
+#                 UPLOAD_DIR / file.filename
+#             )
+
+#             async with aiofiles.open(
+#                 file_path,
+#                 "wb"
+#             ) as out_file:
+
+#                 content = await file.read()
+
+#                 await out_file.write(content)
+
+#             logger.info(
+#                 f"""
+#                 Uploaded:
+#                 {file.filename}
+#                 """
+#             )
+
+#             uploaded_files.append(
+#                 file.filename
+#             )
+
+#             # =============================================
+#             # Load File Content
+#             # =============================================
+
+#             extracted_data = (
+#                 DataLoader.load(
+#                     str(file_path)
+#                 )
+#             )
+
+#             loaded_data.append({
+
+#                 "file_name": file.filename,
+
+#                 "file_type": extension,
+
+#                 "content": str(extracted_data)
+#             })
+
+#             # =============================================
+#             # Save DB Source
+#             # =============================================
+
+#             db.save_source(
+
+#                 session_id=session_id,
+
+#                 source_type=extension.replace(
+#                     ".",
+#                     ""
+#                 ),
+
+#                 source_name=file.filename,
+
+#                 content=str(extracted_data)
+#             )
+
+#         # =================================================
+#         # Run CrewAI
+#         # =================================================
+
+#         result = research_crew.kickoff(
+
+#             inputs={
+
+#                 "query": query,
+
+#                 "loaded_data": loaded_data
+#             }
+#         )
+
+#         # =================================================
+#         # Save Report
+#         # =================================================
+
+#         db.save_report(
+
+#             session_id=session_id,
+
+#             report_content=str(result),
+
+#             confidence_score=0.95
+#         )
+
+#         logger.info(
+#             "Research completed"
+#         )
+
+#         return {
+
+#             "success": True,
+
+#             "session_id": session_id,
+
+#             "query": query,
+
+#             "uploaded_files": uploaded_files,
+
+#             "result": str(result)
+#         }
+
+#     except HTTPException as http_error:
+
+#         raise http_error
+
+#     except Exception as e:
+
+#         logger.error(
+#             f"Research failed: {str(e)}"
+#         )
+
+#         raise HTTPException(
+#             status_code=500,
+#             detail=str(e)
+#         )
+
+
+
+######
+from pathlib import Path
+from typing import Annotated
+
+import aiofiles
+from fastapi import (
+    APIRouter,
+    UploadFile,
+    File,
+    Form,
+    HTTPException
+)
+
+from agents.crew import research_crew
+from core.database import db
+from core.logger import logger
+from tools.data_loader import DataLoader
+
+router = APIRouter(
+    prefix="/research",
+    tags=["Research"]
+)
+
+# =========================================================
+# Configuration
+# =========================================================
+UPLOAD_DIR = Path("uploads")
+UPLOAD_DIR.mkdir(exist_ok=True)
+
+ALLOWED_EXTENSIONS = {
+    ".txt",
+    ".pdf",
+    ".html",
+    ".htm",
+    ".csv",
+    ".xlsx",
+    ".xls"
+}
+
+# =========================================================
+# Research Endpoint
+# =========================================================
+@router.post("/analyze")
+async def analyze_research(
+    # Query is mandatory text
+    query: Annotated[str, Form(...)],
+    
+    # Files default to an empty list, allowing them to be completely optional
+    files: list[UploadFile] = File(default=[])
+):
+    try:
+        logger.info("Research request started")
+
+        # Create Research Session inside the database
+        session_id = db.create_research_session(query=query)
+
+        loaded_data = []
+        uploaded_files = []
+
+        # =================================================
+        # Process Uploaded Files (Only if provided)
+        # =================================================
+        if files:
+            for file in files:
+                # Bypass empty array objects generated by UI tool forms
+                if not file.filename or file.filename.strip() == "":
+                    continue
+
+                extension = Path(file.filename).suffix.lower()
+
+                # Validate Extracted Extension Type
+                if extension not in ALLOWED_EXTENSIONS:
+                    raise HTTPException(
+                        status_code=400,
+                        detail=f"Unsupported file type: {extension}"
+                    )
+
+                # Generate File Destination Path
+                file_path = UPLOAD_DIR / file.filename
+
+                # Save Uploaded Stream Chunk to disk
+                async with aiofiles.open(file_path, "wb") as out_file:
+                    content = await file.read()
+                    await out_file.write(content)
+
+                logger.info(f"Uploaded: {file.filename}")
+                uploaded_files.append(file.filename)
+
+                # Parse and extract layout text content using your data loader
+                extracted_data = DataLoader.load(str(file_path))
+
+                loaded_data.append({
+                    "file_name": file.filename,
+                    "file_type": extension,
+                    "content": str(extracted_data)
+                })
+
+                # Log reference back to DB schema tracking system
+                db.save_source(
+                    session_id=session_id,
+                    source_type=extension.replace(".", ""),
+                    source_name=file.filename,
+                    content=str(extracted_data)
+                )
+
+        # # =================================================
+        # # Run CrewAI Pipeline
+        # # =================================================
+        # # loaded_data will pass safely as [] if no files were uploaded
+        # result = research_crew.kickoff(
+        #     inputs={
+        #         "query": query,
+        #         "loaded_data": loaded_data  
+        #     }
+        # )
+        # =================================================
+        # Run CrewAI 
+        # =================================================
+        
+        # DEBUG LOG: Verify what text actually got extracted
+        logger.info(f"Total files successfully loaded: {len(loaded_data)}")
+        
+        # Structural Backup: Flatten all document contents into a readable string
+        context_string = ""
+        if loaded_data:
+            context_string = "\n\n--- EXTRACTED SOURCE DOCUMENTATION ---\n"
+            for doc in loaded_data:
+                context_string += f"\nFile Name: {doc['file_name']}\n"
+                context_string += f"Content:\n{doc['content']}\n"
+        
+        # We append the document text straight to the query so the LLM is forced to look at it
+        enhanced_query = f"{query}\n{context_string}"
+
+        # result = research_crew.kickoff(
+        #     inputs={
+        #         "query": enhanced_query,             # Force context into the main query
+        #         "raw_document_context": context_string # Separated variable just in case
+        #     }
+        # )
+        # =
+        # Inside your router (This is already correct in your code, keep it like this)
+        result = research_crew.kickoff(
+            inputs={
+                "query": query,
+                "loaded_data": str(loaded_data) # Convert to string to ensure it injects cleanly
+            }
+        )
+        # ================================================
+        # Save Generated Summary
+        # =================================================
+        db.save_report(
+            session_id=session_id,
+            report_content=str(result),
+            confidence_score=0.95
+        )
+
+        logger.info("Research execution workflow completed successfully")
+
+        return {
+            "success": True,
+            "session_id": session_id,
+            "query": query,
+            "uploaded_files": uploaded_files,
+            "result": str(result)
+        }
+
+    except HTTPException as http_error:
+        raise http_error
+        
+    except Exception as e:
+        logger.error(f"Research pipeline failed: {str(e)}")
+        raise HTTPException(
+            status_code=500,
+            detail=str(e)
+        )
