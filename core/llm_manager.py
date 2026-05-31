@@ -1,13 +1,138 @@
-from crewai import LLM
+# from crewai import LLM
+# from threading import Lock
+
+# from core.config import settings
+
+# from core.logger import logger
+# class LLMManager:
+
+#     _instance = None
+#     _lock = Lock()
+
+#     def __new__(cls):
+
+#         if cls._instance is None:
+
+#             with cls._lock:
+
+#                 if cls._instance is None:
+
+#                     cls._instance = super(
+#                         LLMManager,
+#                         cls
+#                     ).__new__(cls)
+
+#                     cls._instance.llm = (
+#                         cls._instance._initialize_llm()
+#                     )
+
+#         return cls._instance
+
+#     def _initialize_llm(self):
+
+#         # =================================
+#         # OLLAMA
+#         # =================================
+#         try:
+
+#             logger.info("Trying Ollama...")
+
+#             llm = LLM(
+#                 model=f"ollama/{settings.OLLAMA_MODEL}",
+#                 base_url=settings.OLLAMA_BASE_URL,
+#                 temperature=settings.TEMPERATURE,
+#             )
+
+#             llm.call("Hi")
+
+#             logger.info("Ollama Loaded")
+
+#             return llm
+
+#         except Exception as e:
+
+#             logger.error(f"Ollama Failed: {e}")
+
+#         # =================================
+#         # GROQ
+#         # =================================
+#         try:
+
+#             print("Trying Groq...")
+
+#             llm = LLM(
+#                 model=settings.GROQ_MODEL,
+#                 api_key=settings.GROQ_API_KEY,
+#                 temperature=settings.TEMPERATURE,
+#             )
+
+#             llm.call("Hi")
+
+#             logger.info("Groq Loaded")
+
+#             return llm
+
+#         except Exception as e:
+
+#             logger.error(f"Groq Failed: {e}")
+
+#         # =================================
+#         # OPENAI
+#         # =================================
+#         try:
+
+#             print("Trying OpenAI...")
+
+#             llm = LLM(
+#                 model=settings.OPENAI_MODEL,
+#                 api_key=settings.OPENAI_API_KEY,
+#                 temperature=settings.TEMPERATURE,
+#             )
+
+#             llm.call("Hi")
+
+#             logger.info("OpenAI Loaded")
+
+#             return llm
+
+#         except Exception as e:
+
+#             logger.error(f"OpenAI Failed: {e}")
+
+#         raise Exception("All LLM providers failed.")
+
+#     def get_llm(self):
+
+#         return self.llm
+
+
+# # =================================
+# # Singleton Instance
+# # =================================
+
+# llm_manager = LLMManager()
+
+
+
+
+
+
 from threading import Lock
 
-from core.config import settings
+from crewai import LLM
 
+from core.config import settings
 from core.logger import logger
+
+
 class LLMManager:
 
     _instance = None
     _lock = Lock()
+
+    # =====================================================
+    # Singleton
+    # =====================================================
 
     def __new__(cls):
 
@@ -17,99 +142,135 @@ class LLMManager:
 
                 if cls._instance is None:
 
-                    cls._instance = super(
-                        LLMManager,
-                        cls
-                    ).__new__(cls)
+                    cls._instance = super().__new__(cls)
 
-                    cls._instance.llm = (
-                        cls._instance._initialize_llm()
-                    )
+                    # Lazy initialization
+                    cls._instance.llm = None
 
         return cls._instance
 
+    # =====================================================
+    # Initialize LLM
+    # =====================================================
+
     def _initialize_llm(self):
 
-        # =================================
+        # =============================================
         # OLLAMA
-        # =================================
+        # =============================================
+
         try:
 
-            logger.info("Trying Ollama...")
+            logger.info(
+                "Trying Ollama..."
+            )
 
             llm = LLM(
-                model=f"ollama/{settings.OLLAMA_MODEL}",
+
+                model=f"""
+                ollama/
+                {settings.OLLAMA_MODEL}
+                """.replace("\n", "").strip(),
+
                 base_url=settings.OLLAMA_BASE_URL,
-                temperature=settings.TEMPERATURE,
+
+                temperature=settings.TEMPERATURE
             )
 
-            llm.call("Hi")
-
-            logger.info("Ollama Loaded")
+            logger.info(
+                "✅ Ollama Initialized"
+            )
 
             return llm
 
         except Exception as e:
 
-            logger.error(f"Ollama Failed: {e}")
+            logger.error(
+                f"Ollama Failed: {e}"
+            )
 
-        # =================================
+        # =============================================
         # GROQ
-        # =================================
+        # =============================================
+
         try:
 
-            print("Trying Groq...")
+            logger.info(
+                "Trying Groq..."
+            )
 
             llm = LLM(
+
                 model=settings.GROQ_MODEL,
+
                 api_key=settings.GROQ_API_KEY,
-                temperature=settings.TEMPERATURE,
+
+                temperature=settings.TEMPERATURE
             )
 
-            llm.call("Hi")
-
-            logger.info("Groq Loaded")
+            logger.info(
+                "✅ Groq Initialized"
+            )
 
             return llm
 
         except Exception as e:
 
-            logger.error(f"Groq Failed: {e}")
+            logger.error(
+                f"Groq Failed: {e}"
+            )
 
-        # =================================
+        # =============================================
         # OPENAI
-        # =================================
+        # =============================================
+
         try:
 
-            print("Trying OpenAI...")
-
-            llm = LLM(
-                model=settings.OPENAI_MODEL,
-                api_key=settings.OPENAI_API_KEY,
-                temperature=settings.TEMPERATURE,
+            logger.info(
+                "Trying OpenAI..."
             )
 
-            llm.call("Hi")
+            llm = LLM(
 
-            logger.info("OpenAI Loaded")
+                model=settings.OPENAI_MODEL,
+
+                api_key=settings.OPENAI_API_KEY,
+
+                temperature=settings.TEMPERATURE
+            )
+
+            logger.info(
+                "✅ OpenAI Initialized"
+            )
 
             return llm
 
         except Exception as e:
 
-            logger.error(f"OpenAI Failed: {e}")
+            logger.error(
+                f"OpenAI Failed: {e}"
+            )
 
-        raise Exception("All LLM providers failed.")
+        raise Exception(
+            "All LLM providers failed."
+        )
+
+    # =====================================================
+    # Public Getter
+    # =====================================================
 
     def get_llm(self):
+
+        # Lazy load
+        if self.llm is None:
+
+            self.llm = self._initialize_llm()
 
         return self.llm
 
 
-# =================================
+# =========================================================
 # Singleton Instance
-# =================================
+# =========================================================
 
 llm_manager = LLMManager()
-
-llm = llm_manager.get_llm()

@@ -1,6 +1,8 @@
 from crewai import Agent
 
-from core.llm_manager import llm
+# from core.llm_manager import llm
+from core.llm_manager import llm_manager
+llm = llm_manager.get_llm()
 
 # extractor_agent = Agent(
 #     role="Information Extractor",

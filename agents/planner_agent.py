@@ -32,8 +32,8 @@
 
 
 from crewai import Agent
-from core.llm_manager import llm
-from tools.tavily_search import tavily_search
+from core.llm_manager import llm_manager
+llm = llm_manager.get_llm()
 
 # =====================================================
 # Planner Agent

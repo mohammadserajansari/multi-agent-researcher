@@ -20,8 +20,11 @@
 
 from crewai import Agent
 
-from core.llm_manager import llm
+# from core.llm_manager import llm
+from core.llm_manager import llm_manager
+
 from tools.tavily_search import tavily_search
+llm = llm_manager.get_llm()
 
 
 # source_gatherer_agent = Agent(
